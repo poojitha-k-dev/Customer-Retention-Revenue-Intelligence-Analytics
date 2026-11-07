@@ -1,0 +1,51 @@
+{
+  "name": "Corporate Navy & Slate",
+  "dataColors": [
+    "#0F172A",
+    "#0EA5E9",
+    "#10B981",
+    "#F59E0B",
+    "#EF4444",
+    "#6366F1",
+    "#8B5CF6",
+    "#EC4899",
+    "#14B8A6",
+    "#F97316"
+  ],
+  "background": "#F8FAFC",
+  "foreground": "#0F172A",
+  "tableAccent": "#0EA5E9",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "outspacePane": [
+          {
+            "backgroundColor": { "solid": { "color": "#F8FAFC" } }
+          }
+        ],
+        "background": [
+          {
+            "color": { "solid": { "color": "#FFFFFF" } },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#E2E8F0" } },
+            "radius": 8
+          }
+        ],
+        "dropShadow": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#000000" } },
+            "transparency": 92,
+            "position": "Outer",
+            "preset": "BottomRight"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -95,3 +95,4 @@ SELECT
     ROUND(AVG(ABS(oit.calculated_items_total - pt.calculated_payment_total)), 2) AS avg_absolute_variance
 FROM order_item_totals oit
 INNER JOIN payment_totals pt ON oit.order_id = pt.order_id;
+

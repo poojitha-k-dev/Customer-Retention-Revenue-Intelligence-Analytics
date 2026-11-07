@@ -109,3 +109,4 @@ FROM cohort_sizes cs
 LEFT JOIN cohort_summary csum ON cs.cohort_month = csum.cohort_month
 GROUP BY cs.cohort_month, cs.size_m0
 ORDER BY cs.cohort_month ASC;
+

@@ -308,3 +308,4 @@ class OlistDataCleaner:
 if __name__ == "__main__":
     cleaner = OlistDataCleaner()
     cleaner.run_pipeline()
+

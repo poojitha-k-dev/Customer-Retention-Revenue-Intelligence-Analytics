@@ -124,3 +124,4 @@ GROUP BY p.product_category_name_english
 HAVING COUNT(DISTINCT o.order_id) >= 500
 ORDER BY avg_review_score DESC
 LIMIT 10;
+

@@ -103,3 +103,4 @@ WHERE o.order_status = 'delivered'
 GROUP BY c.customer_unique_id, c.customer_city, c.customer_state
 ORDER BY total_realized_revenue DESC
 LIMIT 10;
+

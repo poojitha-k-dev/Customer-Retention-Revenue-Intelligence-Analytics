@@ -54,3 +54,4 @@ def test_mart_rfm_integrity():
     }
     actual_segments = set(df_rfm["customer_segment"].unique())
     assert actual_segments.issubset(expected_segments)
+

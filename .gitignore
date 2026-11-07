@@ -18,3 +18,4 @@ data/raw/*.csv
 # Power BI temp files
 *.pbit
 *.tmp
+

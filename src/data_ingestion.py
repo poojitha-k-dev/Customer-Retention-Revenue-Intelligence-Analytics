@@ -118,3 +118,4 @@ def ingest_all(force_download: bool = False) -> dict:
 if __name__ == "__main__":
     force = "--force" in sys.argv
     ingest_all(force_download=force)
+

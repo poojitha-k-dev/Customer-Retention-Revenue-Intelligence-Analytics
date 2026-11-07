@@ -24,3 +24,4 @@ def test_mart_cohort_retention():
     subsequent = df_cohort[df_cohort["cohort_index"] > 0]
     assert (subsequent["retention_rate_pct"] <= 100.0).all()
     assert (subsequent["active_customers"] <= subsequent["cohort_size"]).all()
+

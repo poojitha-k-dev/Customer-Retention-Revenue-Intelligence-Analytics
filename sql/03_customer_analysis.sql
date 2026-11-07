@@ -102,3 +102,4 @@ SELECT
     ROUND(MIN(days_between_orders), 1) AS min_days_between_purchases,
     ROUND(MAX(days_between_orders), 1) AS max_days_between_purchases
 FROM repeat_gaps;
+

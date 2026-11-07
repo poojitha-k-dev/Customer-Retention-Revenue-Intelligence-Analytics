@@ -55,3 +55,4 @@ def test_validate_foreign_key():
     
     assert validator.validate_foreign_key(child_valid, "parent_id", parent, "id", "c", "p") is True
     assert validator.validate_foreign_key(child_invalid, "parent_id", parent, "id", "c", "p") is False
+

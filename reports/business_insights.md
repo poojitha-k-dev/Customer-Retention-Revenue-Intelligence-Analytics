@@ -136,3 +136,4 @@ To ensure analytical integrity, we document the following limitations:
 | **Logistics SLA & Seller Performance Filter** | Late Sellers (>15% delay rate) | Delayed Order Rate (reduce from 8.1% to <4%) | Deprioritize slow fulfillment partners in search algorithm |
 | **Reactivation Blitz** | Cannot Lose Them (13.7k users) | Reactivation Revenue (R$ 200k+ potential) | Send personalized win-back catalog with free shipping |
 | **VIP Loyalty Club** | Champions & Loyal (1.8k users) | Frequency & LTV | Offer exclusive product previews and priority fulfillment |
+
