@@ -1,0 +1,20 @@
+# Environment & Secrets
+.env
+*.env
+__pycache__/
+*.py[cod]
+*$py.class
+*.ipynb_checkpoints/
+.pytest_cache/
+
+# Raw and large datasets (except samples or schemas)
+data/raw/*.csv
+*.csv.gz
+
+# Database local artifacts
+*.sqlite3
+*.log
+
+# Power BI temp files
+*.pbit
+*.tmp

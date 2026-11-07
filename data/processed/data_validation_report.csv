@@ -1,0 +1,29 @@
+check,table,passed,details
+non_empty,customers,True,Row count = 99441
+unique_primary_key,customers,True,Keys ['customer_id']: 0 duplicates found
+null_threshold,customers,True,Column 'customer_unique_id': 0 nulls (0.00% vs max allowed 0.0%)
+non_empty,orders,True,Row count = 99441
+unique_primary_key,orders,True,Keys ['order_id']: 0 duplicates found
+null_threshold,orders,True,Column 'order_purchase_timestamp': 0 nulls (0.00% vs max allowed 0.0%)
+non_empty,order_items,True,Row count = 112650
+unique_primary_key,order_items,True,"Keys ['order_id', 'order_item_id']: 0 duplicates found"
+numeric_range,order_items,True,"Column 'price' in [0.0, None]: 0 violations"
+numeric_range,order_items,True,"Column 'freight_value' in [0.0, None]: 0 violations"
+non_empty,payments,True,Row count = 103886
+unique_primary_key,payments,True,"Keys ['order_id', 'payment_sequential']: 0 duplicates found"
+numeric_range,payments,True,"Column 'payment_value' in [0.0, None]: 0 violations"
+non_empty,reviews,True,Row count = 98673
+unique_primary_key,reviews,True,Keys ['order_id']: 0 duplicates found
+numeric_range,reviews,True,"Column 'review_score' in [1, 5]: 0 violations"
+non_empty,products,True,Row count = 32951
+unique_primary_key,products,True,Keys ['product_id']: 0 duplicates found
+non_empty,sellers,True,Row count = 3095
+unique_primary_key,sellers,True,Keys ['seller_id']: 0 duplicates found
+non_empty,geolocation_aggregated,True,Row count = 19010
+unique_primary_key,geolocation_aggregated,True,Keys ['geolocation_zip_code_prefix']: 0 duplicates found
+foreign_key_integrity,orders->customers,True,customer_id -> customer_id: 0 orphaned records found
+foreign_key_integrity,order_items->orders,True,order_id -> order_id: 0 orphaned records found
+foreign_key_integrity,order_items->products,True,product_id -> product_id: 0 orphaned records found
+foreign_key_integrity,order_items->sellers,True,seller_id -> seller_id: 0 orphaned records found
+foreign_key_integrity,payments->orders,True,order_id -> order_id: 0 orphaned records found
+foreign_key_integrity,reviews->orders,True,order_id -> order_id: 0 orphaned records found
