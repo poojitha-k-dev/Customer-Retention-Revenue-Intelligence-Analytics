@@ -379,3 +379,4 @@ with tab5:
         top_cust.style.format({"monetary_value": "R$ {:,.2f}", "recency_days": "{:,} days"}),
         use_container_width=True
     )
+

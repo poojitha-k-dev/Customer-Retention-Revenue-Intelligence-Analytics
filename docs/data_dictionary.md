@@ -153,3 +153,4 @@ Spatial reference table aggregated by zip code prefix for Brazilian coordinate m
 - **Granularity:** 1 row per translated product category.
 - **Rows:** 74 rows.
 - **Key Columns:** `category`, `total_orders`, `total_units_sold`, `total_gross_revenue`, `avg_item_price`, `avg_review_score`, `avg_delivery_days`, `delay_rate_pct`.
+

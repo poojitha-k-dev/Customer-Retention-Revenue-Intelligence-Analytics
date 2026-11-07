@@ -133,3 +133,4 @@ We structured a multi-stage Common Table Expression (CTE):
 2. **Transformations:** Move from Python Pandas scripts to **dbt (data build tool)** running automated SQL models with incremental materialization.
 3. **Data Ingestion:** Replace batch CSV downloads with event streaming via Apache Kafka or AWS Kinesis capturing real-time order and tracking events.
 4. **BI Layer:** In Power BI, switch from Import mode to **Composite Models** (Aggregations in Import mode, granular order drill-through via DirectQuery).
+
