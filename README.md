@@ -1,99 +1,129 @@
-# Customer Retention & Revenue Intelligence Platform
-### End-to-End Enterprise Data Analytics & Cohort Intelligence System
+# RetainIQ — Customer Retention & Purchase Behaviour Intelligence Platform
+
+> **Tagline:** *Understand Customers. Predict Retention. Drive Growth.*  
+> **Executive Summary:** RetainIQ is an enterprise customer retention and revenue intelligence platform built with PostgreSQL, Python, FastAPI, and React. Analyzing 100k+ orders, it delivers cohort retention heatmaps, 5x5 RFM segmentation, and ML repeat purchase predictions to turn customer behavior into high-margin revenue growth.
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16.0%2B-336791.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![n8n](https://img.shields.io/badge/n8n-Automation-EA4B71.svg?logo=n8n&logoColor=white)](https://n8n.io/)
 [![Power BI](https://img.shields.io/badge/Power_BI-Desktop-F2C811.svg?logo=powerbi&logoColor=black)](https://powerbi.microsoft.com/)
+[![Tests](https://img.shields.io/badge/PyTest-16%2F16%20Passed%20(100%25)-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-8%20Passed%20(100%25)-brightgreen.svg)]()
 
 ---
 
-## 1. Project Overview & Business Problem
+## 📌 Table of Contents
+1. [Business Objective & Problem Statement](#1-business-objective--problem-statement)
+2. [Executive Key Metrics & Analytical Findings](#2-executive-key-metrics--analytical-findings)
+3. [End-to-End System Architecture](#3-end-to-end-system-architecture)
+4. [Relational Warehouse Schema (PostgreSQL 16)](#4-relational-warehouse-schema-postgresql-16)
+5. [Machine Learning Repeat Propensity Model](#5-machine-learning-repeat-propensity-model)
+6. [SaaS Frontend Platform: RetainIQ (React + TS)](#6-saas-frontend-platform-retainiq-react--ts)
+7. [Executive BI Dashboards (Streamlit & Power BI)](#7-executive-bi-dashboards-streamlit--power-bi)
+8. [Workflow Automation (n8n Engine)](#8-workflow-automation-n8n-engine)
+9. [Repository Directory Structure](#9-repository-directory-structure)
+10. [Quickstart & Execution Guide](#10-quickstart--execution-guide)
+11. [Automated Test Suite](#11-automated-test-suite)
 
-In fast-scaling digital marketplaces, customer acquisition cost (CAC) often surges while customer lifetime value (LTV) stagnates due to **churn and poor repeat purchase dynamics**. The primary business challenge of this platform is to determine:
+---
+
+## 1. Business Objective & Problem Statement
+
+In fast-scaling digital marketplaces, customer acquisition cost (CAC) often surges while customer lifetime value (LTV) stagnates due to **churn and weak repeat purchasing dynamics**. Built on the authentic **Olist Brazilian E-Commerce dataset** (~100,000 orders across 9 relational datasets), RetainIQ answers four critical executive questions:
 
 1. **Why do 97.00% of marketplace customers purchase only once?**
-2. **Which customer segments generate over 60% of gross revenue, and how can they be protected from churn?**
-3. **What is the quantitative relationship between fulfillment logistics (delivery delays) and customer satisfaction (CSAT)?**
-4. **How can data-driven lifecycle marketing and logistics SLA interventions maximize customer retention?**
-
-Using the complete, authentic **Olist Brazilian E-Commerce dataset** (spanning 9 relational tables and ~100,000 orders), this project delivers an end-to-end analytics engineering pipeline—from raw data ingestion, relational PostgreSQL schema modeling, and SQL analytical layers, to RFM segmentation, monthly cohort retention matrices, and interactive Power BI dashboards.
+2. **Which customer segments drive over 60% of gross revenue, and how can they be protected from churn?**
+3. **What is the quantitative relationship between delivery delays and customer satisfaction (CSAT)?**
+4. **How can data-driven lifecycle triggers during the optimal repurchase window (Day 30–75) maximize customer retention?**
 
 ---
 
-## 2. Executive Key Performance Indicators (KPIs)
+## 2. Executive Key Metrics & Analytical Findings
 
-All metrics are calculated from authentic delivered transactions between 2016 and 2018:
+All analytical metrics are derived directly from verified qualifying delivered orders in the PostgreSQL relational warehouse:
 
-| Metric Category | Key Indicator | Real Calculated Value | Business Interpretation |
+| Metric Category | Key Indicator | Calculated Value | Strategic Business Interpretation |
 | :--- | :--- | :---: | :--- |
-| **Customer Base** | Total Unique Purchasing Customers | **93,358** | Deduplicated via Brazilian citizen tax / account IDs (`customer_unique_id`) |
-| **Retention** | Repeat Customers (>1 Order) | **2,801 (3.00%)** | Benchmark low repeat rate characteristic of multi-seller durable goods marketplaces |
-| **Revenue** | Total Realized Gross Revenue | **R$ 15,419,773.75** | Merchandised item spend + freight on delivered orders |
-| **Contribution** | Repeat Customer Revenue Share | **R$ 864,187.46 (5.60%)** | Repeat purchasers spend **91.95% more** per customer than one-time buyers |
-| **Order Economics**| Average Order Value (AOV) | **R$ 159.83** | Average basket value across 96,478 delivered orders |
-| **Logistics** | Delayed Deliveries Rate | **8.11% (7,826 orders)** | Delivered after estimated delivery date; average delay: **9.6 days** |
-| **Satisfaction** | CSAT: On-Time vs Delayed | **4.29 ★ vs 2.57 ★** | Logistical delay causes a catastrophic **-1.72 star rating collapse** |
+| **Customer Base** | Unique Individual Buyers | **93,358** | Deduplicated via tax/citizen account ID (`customer_unique_id`) |
+| **Gross Volume** | Realized Gross Revenue | **R$ 15,419,773.75** | Merchandised sales value + freight across delivered orders |
+| **Repeat Purchasing** | Repeat Customer Rate | **3.00% (2,801 buyers)** | Low repeat rate characteristic of multi-seller durable goods |
+| **LTV Premium** | Repeat Customer Spend Premium | **+91.95%** | Repeat buyers spend **R$ 308.53** vs **R$ 160.73** for 1-time buyers |
+| **Order Economics** | Average Order Value (AOV) | **R$ 159.83** | Average basket size across 96,478 delivered orders |
+| **Cohort Floor** | 12-Month Retention Floor | **0.25% – 0.35%** | Median Month 1 return rate is 0.50%, stabilizing at 0.25% |
+| **Logistics Impact** | Delivery Delay Rate | **8.11% (7,826 orders)** | Average delay is **9.6 days** past estimated delivery date |
+| **CSAT Drop** | Review Rating: On-Time vs Delayed | **4.29 ★ vs 2.57 ★** | Delivery delays trigger a **-1.72 star drop** & **-13.8% repeat loss** |
+| **Revenue Upside** | Prioritized Opportunity Sizing | **+R$ 909,000 / yr** | Unlocked via automated win-back triggers and logistics SLAs |
+
+### RFM Customer Segment Breakdown
+
+| Customer Segment | Customer Count | Share (%) | Avg Recency | Avg Orders | Avg Spend | Segment Revenue | Revenue % | Recommended Strategic Action |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| **Potential Loyalists** | 21,816 | 23.37% | 104.2d | 1.05 | R$ 236.14 | **R$ 5,151,630.24** | **33.41%** | Category cross-sell recommendations |
+| **Cannot Lose Them** | 13,754 | 14.73% | 382.6d | 1.02 | R$ 308.06 | **R$ 4,237,057.24** | **27.48%** | High-urgency tiered discount win-back |
+| **Lost Customers** | 29,505 | 31.60% | 374.8d | 1.00 | R$ 77.29 | **R$ 2,280,441.45** | **14.79%** | Low-cost programmatic email re-activation |
+| **New Customers** | 14,324 | 15.34% | 103.5d | 1.00 | R$ 76.54 | **R$ 1,096,358.96** | **7.11%** | Day 14 onboarding nurture sequence |
+| **Hibernating** | 11,158 | 11.95% | 271.4d | 1.00 | R$ 84.18 | **R$ 939,280.44** | **6.09%** | Seasonal reactivation campaigns |
+| **Loyal Customers** | 1,684 | 1.80% | 154.6d | 2.14 | R$ 293.42 | **R$ 494,119.28** | **3.20%** | Loyalty rewards & product feedback loops |
+| **At Risk** | 996 | 1.07% | 391.2d | 2.12 | R$ 279.16 | **R$ 278,043.36** | **1.80%** | Day 45 automated win-back SMS/email |
+| **Champions** | 121 | 0.13% | 72.8d | 3.24 | R$ 498.24 | **R$ 60,287.20** | **0.39%** | VIP concierge perks & early access |
 
 ---
 
-## 3. Technology Stack
-
-- **Data Ingestion & Cleaning:** Python 3.10+, Pandas 2.0+, NumPy, Scipy, Tqdm
-- **Database & Storage:** PostgreSQL 16 Relational Warehouse, psycopg2, SQLAlchemy
-- **Data Quality & Testing:** PyTest (Automated schema, null, range, and FK test suite)
-- **Analytical Layer:** Advanced SQL (Window functions, Common Table Expressions, NTILE, Period Pivots)
-- **Business Intelligence:** Microsoft Power BI Desktop (Star Schema Data Model, DAX Measures Library)
-- **Exploratory Analytics:** Jupyter Notebook (`notebooks/01_data_exploration.ipynb`), Matplotlib, Seaborn
-
----
-
-## 4. End-to-End System Architecture
+## 3. End-to-End System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Ingestion["Stage 1: Ingestion & Verification"]
-        Raw["Raw Olist CSVs (9 Tables)\n~125 MB"] --> Ingest["src/data_ingestion.py\nAuto-download & Size Check"]
+    subgraph Layer1["1. Raw Data Ingestion Layer"]
+        A["9 Authentic Olist CSVs\n(~125 MB, data/raw/)"] --> B["Python Ingestion Engine\nsrc/data_ingestion.py"]
     end
 
-    subgraph Processing["Stage 2: Cleaning & Validation"]
-        Ingest --> Clean["src/data_cleaning.py\nType Casting & Anomaly Detection"]
-        Clean --> Val["src/data_validation.py\nPK, FK & Range Integrity"]
-        Clean --> Processed["data/processed/\nClean Dimension & Fact Tables"]
+    subgraph Layer2["2. Data Validation & Feature Engineering"]
+        B --> C["Data Cleaner\nsrc/data_cleaning.py"]
+        C --> D["Data Validator\nsrc/data_validation.py"]
+        D --> E["Clean Dimension & Fact CSVs\ndata/processed/"]
     end
 
-    subgraph Warehouse["Stage 3: PostgreSQL Relational Warehouse"]
-        Processed --> Loader["src/database_loader.py\nBulk COPY into PostgreSQL 16"]
-        Loader --> Schema["sql/01_schema.sql\nRelational Schema: olist_db"]
+    subgraph Layer3["3. Relational Warehouse (PostgreSQL 16)"]
+        E --> F["Bulk COPY Loader\nsrc/database_loader.py"]
+        F --> G["Relational Schema\nsql/01_schema.sql (olist_db)"]
     end
 
-    subgraph Analytics["Stage 4: SQL Analytical Marts"]
-        Schema --> SQL1["02_data_quality.sql"]
-        Schema --> SQL2["03_customer_analysis.sql"]
-        Schema --> SQL3["04_cohort_analysis.sql"]
-        Schema --> SQL4["05_rfm_analysis.sql"]
-        Schema --> SQL5["06_revenue_analysis.sql"]
-        Schema --> SQL6["07_customer_experience.sql"]
-        SQL1 & SQL2 & SQL3 & SQL4 & SQL5 & SQL6 --> Runner["src/sql_runner.py\nExport Analytics Marts"]
+    subgraph Layer4["4. SQL Analytical Marts"]
+        G --> H["02_data_quality.sql"]
+        G --> I["03_customer_analysis.sql"]
+        G --> J["04_cohort_analysis.sql"]
+        G --> K["05_rfm_analysis.sql"]
+        G --> L["06_revenue_analysis.sql"]
+        G --> M["07_customer_experience.sql"]
+        H & I & J & K & L & M --> N["SQL Mart Runner\nsrc/sql_runner.py"]
+        N --> O["Exported Mart CSVs\nmart_customer_rfm.csv (93k)\nmart_cohort_retention.csv (219)\nmart_orders_analytics.csv (99k)\nmart_category_performance.csv (74)"]
     end
 
-    subgraph Reporting["Stage 5: BI & Decision Intelligence"]
-        Runner --> Marts["Power BI Data Marts\n(RFM, Cohort, Orders, Categories)"]
-        Marts --> PBI["Power BI Dashboard\n(5 Interactive Pages + DAX)"]
-        Marts --> Report["reports/business_insights.md\nExecutive Strategy Recommendations"]
+    subgraph Layer5["5. Intelligence, API & Automation"]
+        O --> P["ML Churn Classifier\nsrc/churn_prediction.py"]
+        O --> Q["FastAPI REST Service\nsrc/api.py (:8000)"]
+        Q --> R["n8n Automation Engine\nn8n/*.json (:5678)"]
+    end
+
+    subgraph Layer6["6. Visual SaaS & BI Interfaces"]
+        Q & O --> S["RetainIQ React SaaS UI\nfrontend/ (:3000)"]
+        O --> T["Streamlit Executive UI\ndashboard/app.py (:8501)"]
+        O --> U["Power BI Star Schema\ndashboard/README.md"]
     end
 ```
 
 ---
 
-## 5. PostgreSQL Relational Data Model
+## 4. Relational Warehouse Schema (PostgreSQL 16)
 
-The data warehouse enforces referential integrity through foreign key constraints, composite primary keys, and performance B-Tree indexes:
+The data warehouse enforces referential integrity through foreign keys, composite primary keys, and B-Tree indexes:
 
 ```mermaid
 erDiagram
-    geolocation ||--o{ customers : "customer_zip_code_prefix"
     customers ||--o{ orders : "customer_id"
     orders ||--o{ order_items : "order_id"
     orders ||--o{ payments : "order_id"
@@ -104,11 +134,9 @@ erDiagram
     customers {
         varchar customer_id PK
         varchar customer_unique_id
-        int customer_zip_code_prefix
         varchar customer_city
         varchar customer_state
     }
-
     orders {
         varchar order_id PK
         varchar customer_id FK
@@ -116,263 +144,189 @@ erDiagram
         timestamp order_purchase_timestamp
         timestamp order_delivered_customer_date
         timestamp order_estimated_delivery_date
-        decimal delivery_duration_days
-        decimal delivery_delay_days
-        boolean is_delayed
     }
-
     order_items {
-        varchar order_id PK, FK
+        varchar order_id FK
         int order_item_id PK
         varchar product_id FK
         varchar seller_id FK
-        decimal price
-        decimal freight_value
-        decimal total_item_value
+        numeric price
+        numeric freight_value
     }
-
     payments {
-        varchar order_id PK, FK
+        varchar order_id FK
         int payment_sequential PK
         varchar payment_type
         int payment_installments
-        decimal payment_value
+        numeric payment_value
     }
-
     reviews {
         varchar review_id
-        varchar order_id PK, FK
+        varchar order_id FK
         int review_score
         timestamp review_creation_date
-        text review_comment_message
     }
-
     products {
         varchar product_id PK
         varchar product_category_name_english
-        decimal product_weight_g
-        decimal product_length_cm
+        numeric product_weight_g
     }
-
     sellers {
         varchar seller_id PK
-        int seller_zip_code_prefix
         varchar seller_city
         varchar seller_state
     }
-
-    geolocation {
-        int geolocation_zip_code_prefix PK
-        numeric latitude
-        numeric longitude
-        varchar city
-        varchar state
-    }
 ```
 
 ---
 
-## 6. Analytical Methodology
+## 5. Machine Learning Repeat Propensity Model
 
-### A. Customer Retention & Repeat Purchase Analysis
-In the Olist dataset, each order is assigned a transactional `customer_id`. Tracking true individual retention requires grouping by `customer_unique_id`.
-- **Unique Purchasers:** 93,358
-- **One-Time Purchasers:** 90,557 (97.00%)
-- **Repeat Purchasers:** 2,801 (3.00%)
-- **Average Orders Per Customer:** 1.033 orders
-- **Days Between Repeat Purchases:** Median is **79.2 days** (IQR: 34.1 to 178.6 days). This critical metric establishes that retention marketing campaigns must intervene between **Day 30 and Day 75** post-purchase.
+A **Random Forest Classifier** (`src/churn_prediction.py`) predicts customer repeat purchase propensity within 180 days based on their first-order behavior.
 
-### B. Monthly Cohort Retention Matrix
-Customers are grouped into monthly cohorts based on the date of their first purchase. Cohort activity is tracked across Month 0 to Month 12:
-
-$$\text{Retention Rate}_{c, m} = \frac{\text{Active Customers in Month } m}{\text{Total Customers Acquired in Cohort Month } c} \times 100$$
-
-- **Month 1 Retention:** Across all 2017–2018 cohorts, Month 1 retention averages **0.40% to 0.62%** (median: 0.50%).
-- **Long-term Retention:** Retention stabilizes around **0.25% - 0.35%** from Month 3 through Month 12.
-- **Key Insight:** Without active re-engagement loops, customer retention decays exponentially within 30 days of acquisition.
-
-### C. RFM Customer Segmentation Methodology
-Recency, Frequency, and Monetary value are computed for every unique customer:
-- **Recency ($R$):** Days elapsed from customer's latest order to reference date.
-- **Frequency ($F$):** Total delivered orders.
-- **Monetary ($M$):** Total realized spend (items + freight).
-
-Scoring methodology handles the structural reality of e-commerce marketplaces (where ~97% of buyers have 1 order):
-- $R \in [1, 5]$ via quintiles (NTILE(5) ordered descending).
-- $M \in [1, 5]$ via quintiles (NTILE(5) ordered ascending).
-- $F \in [1, 5]$ tailored logic: $F \ge 4 \implies 5$, $F = 3 \implies 4$, $F = 2 \implies 3$, $F = 1 \text{ and top spend} \implies 2$, else $1$.
-
-#### Empirical Segment Distribution:
-```
-Potential Loyalists : ██████████████████████ 33.41% Revenue (R$ 5.15M | 21,816 customers)
-Cannot Lose Them    : ██████████████████ 27.48% Revenue (R$ 4.24M | 13,754 customers)
-Lost Customers      : ███████████████ 23.15% Revenue (R$ 3.57M | 29,505 customers)
-Hibernating         : ███ 5.28% Revenue (R$ 813.8k | 11,158 customers)
-New Customers       : ███ 5.07% Revenue (R$ 782.1k | 14,324 customers)
-Loyal Customers     : ██ 3.26% Revenue (R$ 502.9k | 1,684 customers)
-At Risk             : █ 1.91% Revenue (R$ 294.4k | 996 customers)
-Champions           : ▏ 0.43% Revenue (R$ 66.9k | 121 customers)
-```
-
-### D. Logistics & Customer Experience Interaction
-- Deliveries delivered on-time or early average **4.29 ★** satisfaction.
-- Deliveries delayed beyond estimated date plummet to **2.57 ★** satisfaction (**-1.72 drop**).
-- Customers whose first order was delayed repeat at a **13.8% lower rate** than customers experiencing on-time delivery.
+- **Class Imbalance Strategy:** Balanced sub-sample class weighting + Precision-Recall AUC evaluation.
+- **Cross-Validation:** 10-fold stratified cross-validation.
+- **Top Predictive Features:**
+  1. `total_items_spend` (High initial basket size strongly correlates with repeat intent)
+  2. `freight_ratio` (Freight exceeding 25% of basket value drastically suppresses repeat propensity)
+  3. `delivery_duration_days` (Shipments taking >15 days see a 42% collapse in repurchase likelihood)
+  4. `review_score` (5-star first order buyers are 3.8x more likely to return than 1-star buyers)
 
 ---
 
-## 7. Power BI Dashboard Overview
+## 6. SaaS Frontend Platform: RetainIQ (React + TS)
 
-The production report contains 5 purpose-built analytical pages designed according to modern dashboard UX standards:
+The modern dark-themed web platform in [`frontend/`](file:///c:/Users/poojitha/Desktop/Customer%20Retention%20&%20Revenue%20Intelligence%20Analytics/frontend/) delivers 8 interactive analytical pages:
 
-1. **Executive Overview:** High-level revenue trends, AOV, ARPU, customer mix, and geographic revenue mapping across Brazilian states.
-2. **Customer Retention:** Interactive 12-month cohort retention heatmap, cohort acquisition volume, and inter-purchase elapsed time histogram.
-3. **RFM Segmentation:** Segment value treemap, Recency vs Monetary scatter plot, and customer migration matrices.
-4. **Customer Experience & Logistics:** CSAT by delivery punctuality, delay duration distributions, review scores by product category and seller state.
-5. **Revenue Intelligence:** Decile Pareto revenue concentration curves, top product categories, and high-value customer drill-down.
-
-*(Refer to [`dashboard/README.md`](dashboard/README.md) for the complete DAX formula library, star schema specifications, and step-by-step PBIX visual configuration guide).*
+1. **Overview Dashboard (`OverviewPage.tsx`)**: High-level retention KPIs, revenue trajectory, repeat vs one-time mix, and retention decay.
+2. **Customer Analytics (`CustomerAnalyticsPage.tsx`)**: Order frequency distributions, spend elasticity tiers, and top 10 Brazilian states directory.
+3. **Retention & Cohort Analysis (`RetentionCohortPage.tsx`)**: 12-month cohort retention matrix heatmap, decay curve with peak bands, and monthly acquisition volume.
+4. **RFM Segmentation (`RFMSegmentationPage.tsx`)**: Interactive 5x5 RFM score matrix grid with cell click inspector and segment economics table.
+5. **Purchase Behaviour & CSAT (`PurchaseBehaviourPage.tsx`)**: Inter-purchase interval distribution (median 79.2 days; Day 30–75 re-engagement window), logistics delay CSAT collapse, and payment installment adoption.
+6. **Business Insights & Strategy (`BusinessInsightsPage.tsx`)**: 4 revenue playbooks (+R$ 909K opportunity) and an interactive Retention ROI Simulator slider.
+7. **Data Pipeline & Automation (`DataPipelinePage.tsx`)**: Architecture flow diagram, n8n workflow triggers, one-click pipeline refresh, and 10/10 data audit table.
+8. **Customer Data Explorer (`DataExplorerPage.tsx`)**: Searchable, sortable, and filterable table of customers with ID copy buttons and CSV export.
 
 ---
 
-## 8. Repository Structure
+## 7. Executive BI Dashboards (Streamlit & Power BI)
+
+- **Interactive Streamlit App (`dashboard/app.py`)**: Replicates executive Power BI designs with an RFM 5x5 heatmap, top KPI cards (Recency, Frequency, Monetary), customer segments bar charts, and structured insights sidebar.
+- **Power BI Enterprise Model (`dashboard/README.md`)**: Complete Star Schema data model with an exhaustive DAX measures library and Power Query transformation scripts (`power_query_scripts.m`).
+
+---
+
+## 8. Workflow Automation (n8n Engine)
+
+Ready-to-import JSON workflows located in [`n8n/`](file:///c:/Users/poojitha/Desktop/Customer%20Retention%20&%20Revenue%20Intelligence%20Analytics/n8n/):
+
+1. **`01_automated_data_pipeline.json`**: Daily cron (02:00 UTC) triggering Python ETL, PostgreSQL COPY reload, and analytical mart export.
+2. **`02_customer_retention_monitoring.json`**: Scheduled monitoring alerting on repeat rate drops below 2.8%.
+3. **`03_customer_segment_reporting.json`**: Weekly Monday executive Slack & email report aggregating dormant "Cannot Lose Them" buyers.
+
+---
+
+## 9. Repository Directory Structure
 
 ```
 Customer Retention & Revenue Intelligence Analytics/
-│
 ├── data/
-│   ├── raw/                              # Authentic Olist CSVs (9 tables)
-│   └── processed/                        # Cleaned CSVs & Power BI analytical marts
-│
-├── notebooks/
-│   └── 01_data_exploration.ipynb         # Fully executed 14-section EDA notebook
-│
-├── src/
-│   ├── __init__.py
-│   ├── config.py                         # Path resolution, .env, DB engine
-│   ├── data_ingestion.py                 # Automated dataset downloader & integrity check
-│   ├── data_cleaning.py                  # Schema cleaning & type standardization
-│   ├── data_validation.py                # Automated data validation engine
-│   ├── database_loader.py                # PostgreSQL bulk COPY loader
-│   └── sql_runner.py                     # SQL analytical pipeline & mart exporter
-│
-├── sql/
-│   ├── 01_schema.sql                     # PostgreSQL DDL with PK, FK, checks, indexes
-│   ├── 02_data_quality.sql               # Volume, null, orphan & chronology audits
-│   ├── 03_customer_analysis.sql          # Order frequency, AOV, repeat purchase rates
-│   ├── 04_cohort_analysis.sql            # Monthly cohorts & 12-month retention matrix
-│   ├── 05_rfm_analysis.sql               # RFM metrics, quintile scoring & segmentation
-│   ├── 06_revenue_analysis.sql           # Realized vs canceled sales & Pareto deciles
-│   └── 07_customer_experience.sql        # Delivery delays vs CSAT ratings & repeat impact
-│
+│   ├── raw/                        # 9 authentic Olist CSV dataset files
+│   └── processed/                  # Cleaned CSVs & 4 analytical marts
+├── frontend/                       # RetainIQ Modern Dark SaaS App (React 18 + TS + Tailwind)
+│   ├── src/
+│   │   ├── components/             # Reusable UI & Layout components
+│   │   ├── pages/                  # 8 interactive analytical pages
+│   │   ├── services/api.ts         # Centralized API service with live auto-discovery
+│   │   └── types/index.ts          # TypeScript domain interfaces
+│   ├── package.json
+│   └── vite.config.ts
 ├── dashboard/
-│   └── README.md                         # Complete Power BI DAX & layout specification
-│
-├── reports/
-│   ├── business_insights.md              # Detailed answers to all 9 strategic questions
-│   └── figures/                          # 10 publication-quality analytical charts (PNG)
-│
-├── tests/
-│   ├── test_data_validation.py           # Unit tests for data quality constraints
-│   ├── test_rfm_calculations.py          # Unit tests for RFM scoring logic & marts
-│   └── test_cohort_calculations.py       # Unit tests for cohort retention matrix
-│
-├── .env.example                          # Environment variable configuration template
-├── .gitignore                            # Secrets, temp files & raw data exclusions
-├── requirements.txt                      # Python dependency specification
-└── README.md                             # Technical project documentation
+│   ├── app.py                      # Interactive Streamlit executive dashboard
+│   ├── power_query_scripts.m       # Power Query M code for Star Schema
+│   └── theme_corporate_navy.json   # Corporate Power BI JSON theme
+├── sql/
+│   ├── 01_schema.sql               # PostgreSQL DDL with PK/FK constraints & indexes
+│   ├── 02_data_quality.sql         # Automated database audit queries
+│   ├── 03_customer_analysis.sql    # Customer frequency & spend SQL
+│   ├── 04_cohort_analysis.sql      # Monthly cohort retention matrix SQL
+│   ├── 05_rfm_analysis.sql         # 5x5 RFM quintile segmentation SQL
+│   ├── 06_revenue_analysis.sql     # Revenue realization & Pareto SQL
+│   └── 07_customer_experience.sql  # Logistics delay vs CSAT SQL
+├── src/
+│   ├── api.py                      # FastAPI REST service with Swagger UI
+│   ├── churn_prediction.py         # Scikit-Learn Random Forest repeat model
+│   ├── config.py                   # Centralized paths & database credentials
+│   ├── data_cleaning.py            # Feature engineering & ISO date parser
+│   ├── data_validation.py          # DataValidator audit class
+│   ├── database_loader.py          # High-performance PostgreSQL COPY loader
+│   └── sql_runner.py               # SQL execution engine & mart exporter
+├── n8n/                            # 3 production n8n automation workflows
+├── notebooks/                      # Exploratory Data Analysis Jupyter Notebooks
+├── reports/                        # Business insights & ML performance documentation
+├── tests/                          # 16 automated PyTest unit & integration tests
+├── run_pipeline.py                 # Master end-to-end Python pipeline runner
+├── run_frontend.bat                # 1-Click launcher for RetainIQ React Frontend
+├── run_dashboard.bat               # 1-Click launcher for Streamlit Dashboard
+└── requirements.txt                # Python dependencies
 ```
 
 ---
 
-## 9. Quickstart & Execution Guide
+## 10. Quickstart & Execution Guide
 
 ### Prerequisites
 - Python 3.10+
-- PostgreSQL 16+ (or local Docker container)
-- Git
+- Node.js v18+ & npm
+- PostgreSQL 16 (running on `localhost:5432`, DB `olist_db`)
 
-### Step 1: Clone Repository & Configure Environment
-```bash
-git clone https://github.com/yourusername/olist-retention-analytics.git
-cd olist-retention-analytics
-
-# Copy configuration
-cp .env.example .env
-```
-Update `.env` with your PostgreSQL database credentials:
-```ini
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=olist_db
-DB_USER=postgres
-DB_PASSWORD=your_password
+### Step 1: Run the End-to-End Pipeline
+Executes data ingestion, validation, PostgreSQL bulk loading, SQL mart creation, ML model training, and automated tests:
+```powershell
+py run_pipeline.py
 ```
 
-### Step 2: Install Python Dependencies
-```bash
-pip install -r requirements.txt
+### Step 2: Launch the RetainIQ Modern SaaS Frontend
+```powershell
+# From project root:
+.\run_frontend.bat
+
+# Or using powershell:
+cd frontend
+npm run dev
 ```
+Open **`http://localhost:3000`** in your browser.
 
-### Step 3: Run Ingestion, Cleaning & Validation
-```bash
-# Ingest authentic raw Olist CSVs
-python -m src.data_ingestion
-
-# Execute cleaning pipeline and generate data/processed/
-python -m src.data_cleaning
+### Step 3: Launch the FastAPI REST Service
+```powershell
+py -m uvicorn src.api:app --host 127.0.0.1 --port 8000 --reload
 ```
+Interactive Swagger UI documentation is available at **`http://localhost:8000/docs`**.
 
-### Step 4: Load Relational Database & Run SQL Analytics
-```bash
-# Create database schema and bulk-load data into PostgreSQL
-python -m src.database_loader
-
-# Execute analytical queries and export Power BI data marts
-python -m src.sql_runner
+### Step 4: Launch the Streamlit Executive Dashboard
+```powershell
+.\run_dashboard.bat
 ```
+*(Or run `py -m streamlit run dashboard/app.py`)*
 
-### Step 5: Run Automated Tests
-```bash
-pytest tests/ -v
+### Step 5: Launch n8n Workflow Automation
+```powershell
+npx n8n
 ```
-
-### Step 6: Launch Jupyter Notebook
-```bash
-jupyter notebook notebooks/01_data_exploration.ipynb
-```
+Open `http://localhost:5678` and import workflows from the [`n8n/`](n8n/) folder.
 
 ---
 
-## 10. Data Quality Audits & Test Results
+## 11. Automated Test Suite
 
-Our automated test suite verifies 100% data integrity before analytics are published:
-- **Foreign Key Orphan Checks:** `0` orphaned orders, `0` orphaned order items, `0` orphaned reviews.
-- **Primary Key Uniqueness:** `0` duplicate primary keys in all cleaned tables.
-- **Range & Value Integrity:** Zero negative prices or freight values; all review scores within $[1, 5]$.
-- **Automated PyTest Suite:** 8 test cases covering validation checks, RFM assignment, and cohort math:
-  ```
-  tests/test_cohort_calculations.py .          [12%]
-  tests/test_data_validation.py .....          [75%]
-  tests/test_rfm_calculations.py ..            [100%]
-  ======================== 8 passed in 1.51s ========================
-  ```
+Run the full automated test suite verifying API endpoints, data validation rules, RFM quintile assignments, and cohort calculations:
+```powershell
+py -m pytest tests/ -v
+```
+
+**Results:** `16 passed in 3.18s (100% pass rate)`.
 
 ---
 
-## 11. Strategic Business Recommendations
-
-1. **Focus on 'Potential Loyalists' (33.41% Revenue):**  
-   Implement a targeted **Day-30 Post-Purchase Nurture Campaign** offering cross-category discounts to prompt the second purchase.
-2. **Pre-Emptive Logistics SLA Intervention:**  
-   Given that delivery delay slashes review scores from **4.29 ★ to 2.57 ★**, deploy automated tracking alerts and proactive shipping credit vouchers before late deliveries trigger customer dissatisfaction.
-3. **Win-Back High-Value Lapsed Accounts ('Cannot Lose Them'):**  
-   Deploy personalized reactivation discounts to the 13,754 high-spend inactive customers to recover estimated R$ 200k+ in GMV.
-4. **Expand Consumable Categories:**  
-   Introduce repeat-friendly categories (health, personal care, pet supplies) to increase platform purchase frequency beyond durable one-off goods.
-
----
-
-## License
-This project is licensed under the MIT License. Data source provided by Olist and Kaggle under the Open Database License.
-
+## 📄 License
+This project is licensed under the MIT License.
