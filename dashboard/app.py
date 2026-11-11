@@ -18,6 +18,11 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+def render_html(html_str: str):
+    """Safely render HTML in Streamlit without triggering Markdown indented code block parsing."""
+    cleaned = "\n".join(line.strip() for line in html_str.strip().splitlines() if line.strip())
+    st.markdown(cleaned, unsafe_allow_html=True)
+
 # -----------------------------------------------------------------------------
 # Streamlit Page Configuration
 # -----------------------------------------------------------------------------
@@ -214,38 +219,53 @@ st.markdown("""
         background: linear-gradient(90deg, #133966 0%, #1e4b85 100%);
         color: #FFFFFF;
         padding: 12px 18px;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
         display: flex;
         align-items: center;
         gap: 8px;
+        letter-spacing: 0.3px;
     }
     .insight-card {
-        background: #F8FAFC;
+        background: #FFFFFF;
         border: 1px solid #E2E8F0;
         border-radius: 8px;
-        padding: 14px 16px;
-        margin: 14px;
+        padding: 12px 14px;
+        margin: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     }
     .insight-header {
-        font-size: 13px;
+        font-size: 11.5px;
         font-weight: 700;
-        color: #1E293B;
-        margin-bottom: 6px;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    .insight-content-row {
         display: flex;
-        align-items: center;
-        gap: 6px;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .insight-icon-box {
+        font-size: 26px;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+    .insight-text-col {
+        flex-grow: 1;
     }
     .insight-primary-text {
-        font-size: 14px;
-        font-weight: 700;
+        font-size: 15px;
+        font-weight: 800;
         color: #0F172A;
+        line-height: 1.2;
         margin-bottom: 4px;
     }
     .insight-body-text {
-        font-size: 12.5px;
+        font-size: 12px;
         color: #475569;
-        line-height: 1.45;
+        line-height: 1.4;
     }
 
     /* Customizing Streamlit Tabs to match Executive theme */
@@ -290,7 +310,7 @@ rfm_raw, cohort_df, orders_raw, cat_df = load_all_marts()
 # -----------------------------------------------------------------------------
 # Top Executive Header Banner
 # -----------------------------------------------------------------------------
-st.markdown("""
+render_html("""
 <div class="header-banner">
     <div class="header-left">
         <div class="header-icon">🖥️</div>
@@ -303,7 +323,7 @@ st.markdown("""
         <span class="header-tag">Live Enterprise Marts</span>
     </div>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 # -----------------------------------------------------------------------------
 # Executive Filter Slicer Bar (Directly below header)
@@ -380,7 +400,7 @@ total_revenue = filtered_rfm["monetary_value"].sum() if len(filtered_rfm) > 0 el
 kpi_c1, kpi_c2, kpi_c3 = st.columns(3)
 
 with kpi_c1:
-    st.markdown(f"""
+    render_html(f"""
     <div class="kpi-card-box">
         <div class="kpi-icon-wrap kpi-icon-recency">⏱️</div>
         <div class="kpi-text-box">
@@ -389,10 +409,10 @@ with kpi_c1:
         </div>
         <div class="kpi-watermark-icon">⏱️</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 with kpi_c2:
-    st.markdown(f"""
+    render_html(f"""
     <div class="kpi-card-box">
         <div class="kpi-icon-wrap kpi-icon-frequency">📅</div>
         <div class="kpi-text-box">
@@ -401,12 +421,12 @@ with kpi_c2:
         </div>
         <div class="kpi-watermark-icon">📅</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 with kpi_c3:
     # Display formatted currency (e.g. R$ 165.2 Revenue Avg. or $K for large)
     rev_display = f"R$ {avg_monetary:.1f}" if avg_monetary < 10000 else f"R$ {avg_monetary/1000:.1f}K"
-    st.markdown(f"""
+    render_html(f"""
     <div class="kpi-card-box">
         <div class="kpi-icon-wrap kpi-icon-monetary">💲</div>
         <div class="kpi-text-box">
@@ -415,7 +435,7 @@ with kpi_c3:
         </div>
         <div class="kpi-watermark-icon">💰</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 # -----------------------------------------------------------------------------
 # Navigation Tabs
@@ -438,168 +458,165 @@ with main_tab1:
     # ------------------ LEFT COLUMN: Segments Bar Chart & Distribution Donut ------------------
     with col_left:
         # Card 1: Customer Segments
-        st.markdown('<div class="content-card">', unsafe_allow_html=True)
-        st.markdown('<div class="content-card-title">Customer Segments</div>', unsafe_allow_html=True)
-        
-        seg_counts = filtered_rfm["customer_segment"].value_counts().reset_index()
-        seg_counts.columns = ["Segment", "Count"]
-        
-        # Color mapping mirroring executive standard palette
-        palette_map = {
-            "Champions": "#1E3A8A",          # Deep navy blue
-            "Loyal Customers": "#2563EB",    # Royal blue
-            "Potential Loyalists": "#10B981",# Emerald green
-            "New Customers": "#06B6D4",      # Cyan
-            "At Risk": "#F59E0B",            # Amber
-            "Cannot Lose Them": "#EA580C",   # Orange-red
-            "Hibernating": "#8B5CF6",        # Purple
-            "Lost Customers": "#EF4444"      # Crimson red
-        }
-        
-        # Canonical order
-        order_list = ["Champions", "Loyal Customers", "Potential Loyalists", "New Customers", 
-                      "At Risk", "Cannot Lose Them", "Hibernating", "Lost Customers"]
-        seg_counts["Sort"] = seg_counts["Segment"].apply(lambda s: order_list.index(s) if s in order_list else 99)
-        seg_counts = seg_counts.sort_values(by="Sort")
-        
-        fig_bars = go.Figure()
-        fig_bars.add_trace(go.Bar(
-            x=seg_counts["Segment"],
-            y=seg_counts["Count"],
-            marker_color=[palette_map.get(s, "#64748B") for s in seg_counts["Segment"]],
-            text=seg_counts["Count"],
-            textposition="outside",
-            texttemplate="%{text:,.0f}",
-            textfont=dict(size=11, color="#1E293B", family="Segoe UI, sans-serif")
-        ))
-        fig_bars.update_layout(
-            height=250,
-            margin=dict(l=10, r=10, t=15, b=60),
-            plot_bgcolor="#FFFFFF",
-            paper_bgcolor="#FFFFFF",
-            xaxis=dict(tickangle=-35, tickfont=dict(size=10.5, color="#475569")),
-            yaxis=dict(showgrid=True, gridcolor="#F1F5F9", showticklabels=False),
-            bargap=0.25
-        )
-        st.plotly_chart(fig_bars, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Card 2: Segment Distribution
-        st.markdown('<div class="content-card">', unsafe_allow_html=True)
-        st.markdown('<div class="content-card-title">Segment Distribution</div>', unsafe_allow_html=True)
-        
-        fig_donut = go.Figure(data=[go.Pie(
-            labels=seg_counts["Segment"],
-            values=seg_counts["Count"],
-            hole=0.45,
-            marker_colors=[palette_map.get(s, "#64748B") for s in seg_counts["Segment"]],
-            textinfo="percent",
-            textposition="inside",
-            insidetextorientation="horizontal",
-            textfont=dict(size=11, color="#FFFFFF"),
-            hoverinfo="label+value+percent"
-        )])
-        fig_donut.update_layout(
-            height=250,
-            margin=dict(l=10, r=10, t=10, b=10),
-            showlegend=True,
-            legend=dict(
-                orientation="h",
-                yanchor="top",
-                y=-0.08,
-                xanchor="center",
-                x=0.5,
-                font=dict(size=9.5, color="#475569")
+        with st.container(border=True):
+            st.markdown("<div style='font-size:16px; font-weight:700; color:#1E293B; margin-bottom:10px;'>Customer Segments</div>", unsafe_allow_html=True)
+            
+            seg_counts = filtered_rfm["customer_segment"].value_counts().reset_index()
+            seg_counts.columns = ["Segment", "Count"]
+            
+            # Color mapping mirroring executive standard palette
+            palette_map = {
+                "Champions": "#1E3A8A",          # Deep navy blue
+                "Loyal Customers": "#2563EB",    # Royal blue
+                "Potential Loyalists": "#10B981",# Emerald green
+                "New Customers": "#06B6D4",      # Cyan
+                "At Risk": "#F59E0B",            # Amber
+                "Cannot Lose Them": "#EA580C",   # Orange-red
+                "Hibernating": "#8B5CF6",        # Purple
+                "Lost Customers": "#EF4444"      # Crimson red
+            }
+            
+            # Canonical order
+            order_list = ["Champions", "Loyal Customers", "Potential Loyalists", "New Customers", 
+                          "At Risk", "Cannot Lose Them", "Hibernating", "Lost Customers"]
+            seg_counts["Sort"] = seg_counts["Segment"].apply(lambda s: order_list.index(s) if s in order_list else 99)
+            seg_counts = seg_counts.sort_values(by="Sort")
+            
+            fig_bars = go.Figure()
+            fig_bars.add_trace(go.Bar(
+                x=seg_counts["Segment"],
+                y=seg_counts["Count"],
+                marker_color=[palette_map.get(s, "#64748B") for s in seg_counts["Segment"]],
+                text=seg_counts["Count"],
+                textposition="outside",
+                texttemplate="%{text:,.0f}",
+                textfont=dict(size=11, color="#1E293B", family="Segoe UI, sans-serif")
+            ))
+            fig_bars.update_layout(
+                height=250,
+                margin=dict(l=10, r=10, t=15, b=60),
+                plot_bgcolor="#FFFFFF",
+                paper_bgcolor="#FFFFFF",
+                xaxis=dict(tickangle=-35, tickfont=dict(size=10.5, color="#475569")),
+                yaxis=dict(showgrid=True, gridcolor="#F1F5F9", showticklabels=False),
+                bargap=0.25
             )
-        )
-        st.plotly_chart(fig_donut, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+            st.plotly_chart(fig_bars, use_container_width=True)
+            
+        # Card 2: Segment Distribution
+        with st.container(border=True):
+            st.markdown("<div style='font-size:16px; font-weight:700; color:#1E293B; margin-bottom:10px;'>Segment Distribution</div>", unsafe_allow_html=True)
+            
+            fig_donut = go.Figure(data=[go.Pie(
+                labels=seg_counts["Segment"],
+                values=seg_counts["Count"],
+                hole=0.45,
+                marker_colors=[palette_map.get(s, "#64748B") for s in seg_counts["Segment"]],
+                textinfo="percent",
+                textposition="inside",
+                insidetextorientation="horizontal",
+                textfont=dict(size=11, color="#FFFFFF"),
+                hoverinfo="label+value+percent"
+            )])
+            fig_donut.update_layout(
+                height=250,
+                margin=dict(l=10, r=10, t=10, b=10),
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="top",
+                    y=-0.08,
+                    xanchor="center",
+                    x=0.5,
+                    font=dict(size=9.5, color="#475569")
+                )
+            )
+            st.plotly_chart(fig_donut, use_container_width=True)
 
     # ------------------ CENTER COLUMN: 5x5 RFM Score Heatmap ------------------
     with col_center:
-        st.markdown('<div class="content-card">', unsafe_allow_html=True)
-        st.markdown('<div class="content-card-title">RFM Score Heatmap</div>', unsafe_allow_html=True)
-        
-        # Build 5x5 score grid
-        # Y-axis: Recency Score 5 (top) down to 1 (bottom)
-        # X-axis: Frequency Score 1 (left) up to 5 (right)
-        grid_counts = np.zeros((5, 5))
-        grid_spend = np.zeros((5, 5))
-        grid_colors = np.zeros((5, 5))
-        text_matrix = [["" for _ in range(5)] for _ in range(5)]
-        
-        # Colorscale mapping: normalized composite score from Red to Green
-        for r_idx, r_val in enumerate([5, 4, 3, 2, 1]):
-            for f_idx, f_val in enumerate([1, 2, 3, 4, 5]):
-                subset = filtered_rfm[(filtered_rfm["r_score"] == r_val) & (filtered_rfm["f_score"] == f_val)]
-                c_count = len(subset)
-                tot_spend = subset["monetary_value"].sum()
-                grid_counts[r_idx, f_idx] = c_count
-                grid_spend[r_idx, f_idx] = tot_spend
-                
-                # Health weight: higher recency & frequency = higher health
-                grid_colors[r_idx, f_idx] = (r_val * 1.5 + f_val * 2.0)
-        
-        # Overlay strategic segment labels matching reference image
-        annotations_map = {
-            (0, 4): ("• Champions", "#FFFFFF"),
-            (1, 3): ("• Loyal Customers", "#FFFFFF"),
-            (1, 1): ("• Potential Loyalists", "#FFFFFF"),
-            (0, 0): ("• New Customers", "#FFFFFF"),
-            (3, 1): ("• At Risk", "#FFFFFF"),
-            (4, 0): ("• Lost Customers", "#FFFFFF"),
-            (3, 0): ("• Hibernating", "#FFFFFF"),
-            (4, 3): ("• Cannot Lose Them", "#FFFFFF")
-        }
-        
-        for (r_idx, f_idx), (label, text_color) in annotations_map.items():
-            count_str = f"{int(grid_counts[r_idx, f_idx]):,}"
-            text_matrix[r_idx][f_idx] = f"<b>{label}</b><br><span style='font-size:10px;'>({count_str})</span>"
-        
-        # Plotly Heatmap
-        fig_heat = go.Figure(data=go.Heatmap(
-            z=grid_colors,
-            x=["1", "2", "3", "4", "5"],
-            y=["5", "4", "3", "2", "1"],
-            text=text_matrix,
-            texttemplate="%{text}",
-            textfont=dict(size=11.5, family="Segoe UI, sans-serif"),
-            colorscale=[
-                [0.0, "#DC2626"],   # Deep Red (Lost)
-                [0.22, "#EA580C"],  # Orange (At Risk)
-                [0.45, "#F59E0B"],  # Amber (Hibernating)
-                [0.65, "#84CC16"],  # Yellow-Green (Potential)
-                [0.85, "#10B981"],  # Emerald (Loyal)
-                [1.0, "#059669"]    # Dark Green (Champions)
-            ],
-            showscale=False,
-            hoverongaps=False,
-            hovertemplate=(
-                "<b>Recency Score:</b> %{y}<br>" +
-                "<b>Frequency Score:</b> %{x}<br>" +
-                "<b>Customer Volume:</b> %{customdata[0]:,}<br>" +
-                "<b>Total Revenue:</b> R$ %{customdata[1]:,.2f}<extra></extra>"
-            ),
-            customdata=np.dstack((grid_counts, grid_spend))
-        ))
-        
-        fig_heat.update_layout(
-            height=536,
-            margin=dict(l=40, r=20, t=10, b=45),
-            xaxis=dict(
-                title=dict(text="Frequency Score", font=dict(size=12, color="#475569", family="Segoe UI")),
-                tickfont=dict(size=11, color="#1E293B"),
-                side="top"
-            ),
-            yaxis=dict(
-                title=dict(text="Recency Score", font=dict(size=12, color="#475569", family="Segoe UI")),
-                tickfont=dict(size=11, color="#1E293B")
-            ),
-            plot_bgcolor="#FFFFFF",
-            paper_bgcolor="#FFFFFF"
-        )
-        st.plotly_chart(fig_heat, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("<div style='font-size:16px; font-weight:700; color:#1E293B; margin-bottom:10px;'>RFM Score Heatmap</div>", unsafe_allow_html=True)
+            
+            # Build 5x5 score grid
+            # Y-axis: Recency Score 5 (top) down to 1 (bottom)
+            # X-axis: Frequency Score 1 (left) up to 5 (right)
+            grid_counts = np.zeros((5, 5))
+            grid_spend = np.zeros((5, 5))
+            grid_colors = np.zeros((5, 5))
+            text_matrix = [["" for _ in range(5)] for _ in range(5)]
+            
+            # Colorscale mapping: normalized composite score from Red to Green
+            for r_idx, r_val in enumerate([5, 4, 3, 2, 1]):
+                for f_idx, f_val in enumerate([1, 2, 3, 4, 5]):
+                    subset = filtered_rfm[(filtered_rfm["r_score"] == r_val) & (filtered_rfm["f_score"] == f_val)]
+                    c_count = len(subset)
+                    tot_spend = subset["monetary_value"].sum()
+                    grid_counts[r_idx, f_idx] = c_count
+                    grid_spend[r_idx, f_idx] = tot_spend
+                    
+                    # Health weight: higher recency & frequency = higher health
+                    grid_colors[r_idx, f_idx] = (r_val * 1.5 + f_val * 2.0)
+            
+            # Overlay strategic segment labels matching reference image
+            annotations_map = {
+                (0, 4): ("• Champions", "#FFFFFF"),
+                (1, 3): ("• Loyal Customers", "#FFFFFF"),
+                (1, 1): ("• Potential Loyalists", "#FFFFFF"),
+                (0, 0): ("• New Customers", "#FFFFFF"),
+                (3, 1): ("• At Risk", "#FFFFFF"),
+                (4, 0): ("• Lost Customers", "#FFFFFF"),
+                (3, 0): ("• Hibernating", "#FFFFFF"),
+                (4, 3): ("• Cannot Lose Them", "#FFFFFF")
+            }
+            
+            for (r_idx, f_idx), (label, text_color) in annotations_map.items():
+                count_str = f"{int(grid_counts[r_idx, f_idx]):,}"
+                text_matrix[r_idx][f_idx] = f"<b>{label}</b><br><span style='font-size:10px;'>({count_str})</span>"
+            
+            # Plotly Heatmap
+            fig_heat = go.Figure(data=go.Heatmap(
+                z=grid_colors,
+                x=["1", "2", "3", "4", "5"],
+                y=["5", "4", "3", "2", "1"],
+                text=text_matrix,
+                texttemplate="%{text}",
+                textfont=dict(size=11.5, family="Segoe UI, sans-serif"),
+                colorscale=[
+                    [0.0, "#DC2626"],   # Deep Red (Lost)
+                    [0.22, "#EA580C"],  # Orange (At Risk)
+                    [0.45, "#F59E0B"],  # Amber (Hibernating)
+                    [0.65, "#84CC16"],  # Yellow-Green (Potential)
+                    [0.85, "#10B981"],  # Emerald (Loyal)
+                    [1.0, "#059669"]    # Dark Green (Champions)
+                ],
+                showscale=False,
+                hoverongaps=False,
+                hovertemplate=(
+                    "<b>Recency Score:</b> %{y}<br>" +
+                    "<b>Frequency Score:</b> %{x}<br>" +
+                    "<b>Customer Volume:</b> %{customdata[0]:,}<br>" +
+                    "<b>Total Revenue:</b> R$ %{customdata[1]:,.2f}<extra></extra>"
+                ),
+                customdata=np.dstack((grid_counts, grid_spend))
+            ))
+            
+            fig_heat.update_layout(
+                height=536,
+                margin=dict(l=40, r=20, t=10, b=45),
+                xaxis=dict(
+                    title=dict(text="Frequency Score", font=dict(size=12, color="#475569", family="Segoe UI")),
+                    tickfont=dict(size=11, color="#1E293B"),
+                    side="top"
+                ),
+                yaxis=dict(
+                    title=dict(text="Recency Score", font=dict(size=12, color="#475569", family="Segoe UI")),
+                    tickfont=dict(size=11, color="#1E293B")
+                ),
+                plot_bgcolor="#FFFFFF",
+                paper_bgcolor="#FFFFFF"
+            )
+            st.plotly_chart(fig_heat, use_container_width=True)
 
     # ------------------ RIGHT COLUMN: Insights Panel ------------------
     with col_right:
@@ -615,45 +632,54 @@ with main_tab1:
         
         repeat_rate_live = (len(filtered_rfm[filtered_rfm["frequency"] > 1]) / len(filtered_rfm) * 100) if len(filtered_rfm) > 0 else 0
         
-        st.markdown(f"""
+        insights_html = f"""
         <div class="insights-wrapper">
             <div class="insights-top-bar">
                 <span>💡</span> Insights & Retention Actions
             </div>
-            
             <div class="insight-card">
-                <div class="insight-header">🏆 Top Revenue Segment</div>
-                <div class="insight-primary-text">Potential Loyalists: R$ {pot_loyal_rev/1e6:.2f}M</div>
-                <div class="insight-body-text">
-                    Drives <b>{pot_loyal_share:.1f}%</b> of total platform sales. High recent engagement with substantial basket sizes. Prime candidates for personalized loyalty bundles.
+                <div class="insight-header">Top Revenue Segment</div>
+                <div class="insight-content-row">
+                    <div class="insight-icon-box">🏆</div>
+                    <div class="insight-text-col">
+                        <div class="insight-primary-text">Potential Loyalists: R$ {pot_loyal_rev/1e6:.2f}M</div>
+                        <div class="insight-body-text">Drives <b>{pot_loyal_share:.1f}%</b> of total platform sales. High recent engagement with high upsell propensity.</div>
+                    </div>
                 </div>
             </div>
-            
             <div class="insight-card">
-                <div class="insight-header">⚠️ At-Risk Spenders</div>
-                <div class="insight-primary-text">{at_risk_count:,} Customers (R$ {at_risk_rev/1e6:.2f}M)</div>
-                <div class="insight-body-text">
-                    High historical spend but dormant &gt;180 days. Immediate automated win-back incentives via n8n recommended before permanent churn.
+                <div class="insight-header">At-Risk Spenders</div>
+                <div class="insight-content-row">
+                    <div class="insight-icon-box">⚠️</div>
+                    <div class="insight-text-col">
+                        <div class="insight-primary-text">{at_risk_count:,} Customers</div>
+                        <div class="insight-body-text">High historical spend (R$ {at_risk_rev/1e6:.2f}M) but dormant &gt;180 days. Immediate automated win-back incentives recommended.</div>
+                    </div>
                 </div>
             </div>
-            
             <div class="insight-card">
-                <div class="insight-header">⭐ High-Value Champions</div>
-                <div class="insight-primary-text">{champ_loyal_count:,} VIP Champions & Loyalists</div>
-                <div class="insight-body-text">
-                    Generated <b>R$ {champ_loyal_rev/1e6:.2f}M</b> in realized sales with highest AOV. Provide VIP concierge support and early access product previews.
+                <div class="insight-header">High-Value Champions</div>
+                <div class="insight-content-row">
+                    <div class="insight-icon-box">⭐</div>
+                    <div class="insight-text-col">
+                        <div class="insight-primary-text">{champ_loyal_count:,} VIP Champions</div>
+                        <div class="insight-body-text">Generated <b>R$ {champ_loyal_rev/1e6:.2f}M</b> with highest AOV. Prioritize for VIP loyalty perks and early access.</div>
+                    </div>
                 </div>
             </div>
-            
             <div class="insight-card">
-                <div class="insight-header">🎯 Re-Engagement Cadence</div>
-                <div class="insight-primary-text">Day 30–75 Optimal Window</div>
-                <div class="insight-body-text">
-                    Median time between first and repeat purchase is <b>79.2 days</b>. Triggering automated re-engagement at Day 45 captures latent repeat conversion.
+                <div class="insight-header">Re-Engagement Cadence</div>
+                <div class="insight-content-row">
+                    <div class="insight-icon-box">🎯</div>
+                    <div class="insight-text-col">
+                        <div class="insight-primary-text">Day 30–75 Optimal Window</div>
+                        <div class="insight-body-text">Median inter-purchase gap is <b>79.2 days</b>. Automated n8n win-back triggers capture latent repeat conversion.</div>
+                    </div>
                 </div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        render_html(insights_html)
 
 
 # -----------------------------------------------------------------------------
