@@ -1,0 +1,199 @@
+{
+  "name": "01_Automated_Data_Pipeline",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e1f1a1a0-1111-4000-8000-000000000001",
+      "name": "Manual / Schedule Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 2,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "e1f1a1a0-1111-4000-8000-000000000002",
+      "name": "Weekly Schedule (Sun 2AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [220, 480]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.FASTAPI_BASE_URL || 'http://127.0.0.1:8000' }}/pipeline/run",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "={{ $env.API_KEY || 'olist_secret_token_2026' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"force_download\": false,\n  \"run_tests\": true\n}",
+        "options": {}
+      },
+      "id": "e1f1a1a0-1111-4000-8000-000000000003",
+      "name": "Trigger FastAPI Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 380]
+    },
+    {
+      "parameters": {
+        "unit": "seconds",
+        "amount": 15
+      },
+      "id": "e1f1a1a0-1111-4000-8000-000000000004",
+      "name": "Wait for Ingestion",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [680, 380],
+      "webhookId": "pipeline-wait-webhook"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.FASTAPI_BASE_URL || 'http://127.0.0.1:8000' }}/pipeline/status",
+        "options": {}
+      },
+      "id": "e1f1a1a0-1111-4000-8000-000000000005",
+      "name": "Check Pipeline Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 380]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "equals",
+              "value2": "completed"
+            }
+          ]
+        }
+      },
+      "id": "e1f1a1a0-1111-4000-8000-000000000006",
+      "name": "IF Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1120, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare Success Payload\nreturn [{\n  json: {\n    alert_type: 'SUCCESS',\n    message: 'Olist E-Commerce Data Pipeline executed successfully.',\n    duration_seconds: $('Check Pipeline Status').first().json.duration_seconds || 0,\n    completed_at: $('Check Pipeline Status').first().json.last_run_end || new Date().toISOString(),\n    status: 'COMPLETED'\n  }\n}];"
+      },
+      "id": "e1f1a1a0-1111-4000-8000-000000000007",
+      "name": "Format Success Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare Failure Alert Payload\nreturn [{\n  json: {\n    alert_type: 'FAILURE',\n    message: 'Olist E-Commerce Data Pipeline execution failed or timed out.',\n    error_details: $('Check Pipeline Status').first().json.error || 'Pipeline did not complete',\n    status: $('Check Pipeline Status').first().json.status || 'UNKNOWN',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "e1f1a1a0-1111-4000-8000-000000000008",
+      "name": "Format Failure Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 480]
+    }
+  ],
+  "connections": {
+    "Manual / Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Trigger FastAPI Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Schedule (Sun 2AM)": {
+      "main": [
+        [
+          {
+            "node": "Trigger FastAPI Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger FastAPI Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Wait for Ingestion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Ingestion": {
+      "main": [
+        [
+          {
+            "node": "Check Pipeline Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Pipeline Status": {
+      "main": [
+        [
+          {
+            "node": "IF Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Success?": {
+      "main": [
+        [
+          {
+            "node": "Format Success Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

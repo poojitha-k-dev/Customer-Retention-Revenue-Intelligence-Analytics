@@ -1,0 +1,158 @@
+{
+  "name": "02_Customer_Retention_Monitoring",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e2f2a2a0-2222-4000-8000-000000000001",
+      "name": "Manual / Schedule Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [220, 320]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 1,
+              "triggerAtHour": 8,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "e2f2a2a0-2222-4000-8000-000000000002",
+      "name": "Monthly Schedule (1st at 8AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [220, 500]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.FASTAPI_BASE_URL || 'http://127.0.0.1:8000' }}/reports/summary",
+        "options": {}
+      },
+      "id": "e2f2a2a0-2222-4000-8000-000000000003",
+      "name": "Fetch Retention & CSAT Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Evaluate KPI Thresholds Against Configured Governance Targets\nconst data = $input.first().json;\n\nconst thresholds = {\n  min_repeat_purchase_rate: 3.5,\n  max_delayed_deliveries_pct: 8.0,\n  min_delayed_csat: 3.0\n};\n\nconst breaches = [];\n\nif (data.repeat_purchase_rate_pct < thresholds.min_repeat_purchase_rate) {\n  breaches.push({\n    metric: 'Repeat Purchase Rate (%)',\n    actual: data.repeat_purchase_rate_pct,\n    threshold: thresholds.min_repeat_purchase_rate,\n    severity: 'WARNING',\n    note: 'Repeat purchase rate is below 3.5% target.'\n  });\n}\n\nif (data.delayed_deliveries_pct > thresholds.max_delayed_deliveries_pct) {\n  breaches.push({\n    metric: 'Delayed Deliveries (%)',\n    actual: data.delayed_deliveries_pct,\n    threshold: thresholds.max_delayed_deliveries_pct,\n    severity: 'CRITICAL',\n    note: 'Logistics SLA breached; delayed deliveries exceed 8.0%.'\n  });\n}\n\nif (data.delayed_avg_review_score < thresholds.min_delayed_csat) {\n  breaches.push({\n    metric: 'Delayed Order CSAT Rating',\n    actual: data.delayed_avg_review_score,\n    threshold: thresholds.min_delayed_csat,\n    severity: 'CRITICAL',\n    note: 'Customer review rating for late orders has collapsed below 3.0 stars.'\n  });\n}\n\nreturn [{\n  json: {\n    alert_triggered: breaches.length > 0,\n    total_breaches: breaches.length,\n    breaches: breaches,\n    metrics: data,\n    audit_timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "e2f2a2a0-2222-4000-8000-000000000004",
+      "name": "Compare Metrics Against Thresholds",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.alert_triggered }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "e2f2a2a0-2222-4000-8000-000000000005",
+      "name": "IF Alert Triggered?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [940, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const alert = $input.first().json;\n\nreturn [{\n  json: {\n    notification_channel: 'slack_or_email',\n    subject: `🚨 [RETENTION ALERT] ${alert.total_breaches} Governance Breaches Detected`,\n    body: `Retention and Logistics Audit identified ${alert.total_breaches} metric threshold breaches at ${alert.audit_timestamp}.\\n\\n` +\n          alert.breaches.map(b => `• [${b.severity}] ${b.metric}: Actual = ${b.actual} vs Target = ${b.threshold}. ${b.note}`).join('\\n') + \n          `\\n\\nAction: Triggering automated mitigation and notifying Retention Marketing & Logistics Ops.`,\n    severity: 'HIGH'\n  }\n}];"
+      },
+      "id": "e2f2a2a0-2222-4000-8000-000000000006",
+      "name": "Generate Retention Alert Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1180, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    notification_channel: 'slack_or_email',\n    subject: '✅ [RETENTION OK] All Customer Retention & Logistics Metrics Compliant',\n    body: 'All monitored customer retention, AOV, and logistics metrics are within healthy target thresholds.',\n    severity: 'INFO'\n  }\n}];"
+      },
+      "id": "e2f2a2a0-2222-4000-8000-000000000007",
+      "name": "Format Normal Status Notice",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1180, 500]
+    }
+  ],
+  "connections": {
+    "Manual / Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Retention & CSAT Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monthly Schedule (1st at 8AM)": {
+      "main": [
+        [
+          {
+            "node": "Fetch Retention & CSAT Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Retention & CSAT Summary": {
+      "main": [
+        [
+          {
+            "node": "Compare Metrics Against Thresholds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare Metrics Against Thresholds": {
+      "main": [
+        [
+          {
+            "node": "IF Alert Triggered?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Alert Triggered?": {
+      "main": [
+        [
+          {
+            "node": "Generate Retention Alert Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Normal Status Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "name": "03_Customer_Segment_Reporting",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e3f3a3a0-3333-4000-8000-000000000001",
+      "name": "Manual / Schedule Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [220, 320]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": 1,
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "e3f3a3a0-3333-4000-8000-000000000002",
+      "name": "Weekly Schedule (Mon 9AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [220, 480]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.FASTAPI_BASE_URL || 'http://127.0.0.1:8000' }}/reports/rfm",
+        "options": {}
+      },
+      "id": "e3f3a3a0-3333-4000-8000-000000000003",
+      "name": "Fetch RFM Segment Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst segments = data.segments;\n\n// Construct Executive HTML Email Report\nlet html = `\n<div style=\"font-family: Arial, sans-serif; max-width: 720px; color: #1E293B;\">\n  <h2 style=\"color: #0F172A; border-bottom: 2px solid #0EA5E9; padding-bottom: 8px;\">\n    📊 Weekly Customer Segment & Revenue Intelligence Briefing\n  </h2>\n  <p><strong>Total Realized Marketplace Revenue:</strong> R$ ${data.total_gross_revenue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>\n  <p><strong>Total Active Customer Accounts:</strong> ${data.total_unique_customers.toLocaleString()}</p>\n  \n  <table style=\"width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px;\">\n    <thead>\n      <tr style=\"background-color: #0F172A; color: #FFFFFF; text-align: left;\">\n        <th style=\"padding: 10px;\">Customer Segment</th>\n        <th style=\"padding: 10px;\">Customers</th>\n        <th style=\"padding: 10px;\">Cust %</th>\n        <th style=\"padding: 10px;\">Revenue (BRL)</th>\n        <th style=\"padding: 10px;\">Rev %</th>\n        <th style=\"padding: 10px;\">Avg Spend</th>\n        <th style=\"padding: 10px;\">Avg Recency</th>\n      </tr>\n    </thead>\n    <tbody>\n`;\n\nsegments.forEach((s, idx) => {\n  const bg = idx % 2 === 0 ? '#F8FAFC' : '#FFFFFF';\n  html += `\n    <tr style=\"background-color: ${bg}; border-bottom: 1px solid #E2E8F0;\">\n      <td style=\"padding: 8px; font-weight: bold;\">${s.customer_segment}</td>\n      <td style=\"padding: 8px;\">${s.customer_count.toLocaleString()}</td>\n      <td style=\"padding: 8px;\">${s.customer_share_pct}%</td>\n      <td style=\"padding: 8px;\">R$ ${s.total_revenue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>\n      <td style=\"padding: 8px; font-weight: bold; color: #0EA5E9;\">${s.revenue_share_pct}%</td>\n      <td style=\"padding: 8px;\">R$ ${s.avg_spend.toFixed(2)}</td>\n      <td style=\"padding: 8px;\">${s.avg_recency_days}d</td>\n    </tr>\n  `;\n});\n\nhtml += `\n    </tbody>\n  </table>\n\n  <div style=\"background-color: #EFF6FF; border-left: 4px solid #3B82F6; padding: 12px; margin-top: 20px; border-radius: 4px;\">\n    <h4 style=\"margin: 0 0 6px 0; color: #1E40AF;\">🎯 Strategic Retention Actions for this Week:</h4>\n    <ul style=\"margin: 0; padding-left: 20px; font-size: 13px;\">\n      <li><strong>Potential Loyalists (33.41% Rev):</strong> Trigger Day-30 replenishment discount vouchers.</li>\n      <li><strong>Cannot Lose Them (27.48% Rev):</strong> Dispatch personalized reactivation catalog to 13.7k lapsed high-value customers.</li>\n    </ul>\n  </div>\n</div>\n`;\n\nreturn [{\n  json: {\n    email_subject: 'Weekly Executive Briefing: Customer Retention & Revenue Segments',\n    recipient: $env.REPORT_RECIPIENT_EMAIL || 'leadership@company.com',\n    html_content: html,\n    segments_summary: segments\n  }\n}];"
+      },
+      "id": "e3f3a3a0-3333-4000-8000-000000000004",
+      "name": "Format Executive HTML Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Production Dispatch Node (Ready for Email, Slack, or Webhook)\nconst payload = $input.first().json;\n\nreturn [{\n  json: {\n    status: 'READY_TO_DISPATCH',\n    target_email: payload.recipient,\n    subject: payload.email_subject,\n    preview_length: payload.html_content.length,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "e3f3a3a0-3333-4000-8000-000000000005",
+      "name": "Dispatch Notification Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [940, 400]
+    }
+  ],
+  "connections": {
+    "Manual / Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch RFM Segment Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Schedule (Mon 9AM)": {
+      "main": [
+        [
+          {
+            "node": "Fetch RFM Segment Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch RFM Segment Analytics": {
+      "main": [
+        [
+          {
+            "node": "Format Executive HTML Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Executive HTML Email": {
+      "main": [
+        [
+          {
+            "node": "Dispatch Notification Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
