@@ -240,3 +240,4 @@ export const PurchaseBehaviourPage: React.FC<PurchaseBehaviourProps> = ({ catego
     </div>
   );
 };
+

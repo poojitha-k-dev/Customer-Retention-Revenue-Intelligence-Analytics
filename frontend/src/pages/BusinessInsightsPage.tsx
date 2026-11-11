@@ -257,3 +257,4 @@ export const BusinessInsightsPage: React.FC = () => {
     </div>
   );
 };
+

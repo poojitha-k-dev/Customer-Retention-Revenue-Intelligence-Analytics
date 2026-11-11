@@ -223,3 +223,4 @@ export const CustomerAnalyticsPage: React.FC<CustomerAnalyticsProps> = ({ kpis }
     </div>
   );
 };
+

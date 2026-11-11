@@ -352,3 +352,4 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ kpis, segments, onNa
     </div>
   );
 };
+

@@ -30,3 +30,4 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = 'blue', classN
     </span>
   );
 };
+

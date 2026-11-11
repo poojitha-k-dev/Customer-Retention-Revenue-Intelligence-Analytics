@@ -320,3 +320,4 @@ export const RFMSegmentationPage: React.FC<RFMSegmentationProps> = ({ segments }
     </div>
   );
 };
+

@@ -82,3 +82,4 @@ Open **`http://localhost:3000`** in your browser.
 py -m uvicorn src.api:app --host 127.0.0.1 --port 8000 --reload
 ```
 RetainIQ automatically detects the live FastAPI service on port 8000 and switches to live sync mode!
+

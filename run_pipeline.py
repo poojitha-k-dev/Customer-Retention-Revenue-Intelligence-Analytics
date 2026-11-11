@@ -46,7 +46,7 @@ def run_tests():
     cmd = [sys.executable, "-m", "pytest", "tests/", "-v"]
     res = subprocess.run(cmd)
     if res.returncode == 0:
-        print("\n>>> [SUCCESS] All 8 automated tests passed!\n")
+        print("\n>>> [SUCCESS] All 16 automated tests passed!\n")
     else:
         print("\n>>> [WARNING] Some tests reported failures.\n")
 
@@ -67,14 +67,20 @@ def main():
     # 4. SQL Analytics & Mart Generation
     run_step("Step 4: SQL Analytical Queries & Mart Export", "src.sql_runner")
     
-    # 5. Tests
+    # 5. Machine Learning Propensity Model
+    run_step("Step 5: Machine Learning Repeat Purchase Model", "src.churn_prediction")
+    
+    # 6. Automated Tests
     run_tests()
     
     total_elapsed = time.time() - total_start
     print_banner(f"PIPELINE COMPLETE - TOTAL TIME: {total_elapsed:.2f}s")
-    print("All datasets processed, PostgreSQL tables loaded, and Power BI marts generated.")
+    print("All datasets processed, PostgreSQL tables loaded, ML models trained, and Power BI marts generated.")
     print("\nTo launch the interactive Streamlit analytics dashboard, run:")
-    print("    streamlit run dashboard/app.py\n")
+    print("    py -m streamlit run dashboard/app.py")
+    print("    (or run .\\run_dashboard.bat)\n")
+    print("To launch the FastAPI REST service, run:")
+    print("    py -m uvicorn src.api:app --host 127.0.0.1 --port 8000 --reload\n")
 
 
 if __name__ == "__main__":

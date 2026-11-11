@@ -102,3 +102,4 @@ REPORT_RECIPIENT_EMAIL=leadership@company.com
 2. In n8n, open **Workflow 2: Customer Retention Monitoring**.
 3. Click **Test Step** or **Execute Workflow**.
 4. Watch each node illuminate green as it fetches live data from `http://127.0.0.1:8000/reports/summary`, evaluates the 3 thresholds, and formats the executive incident alert!
+

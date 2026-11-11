@@ -11,17 +11,17 @@ Can we predict whether a first-time purchaser will become a repeat customer base
 ---
 
 ## 2. Model Performance Metrics
-- **Test Set ROC-AUC:** **0.6028** (Significantly superior to random baseline 0.50).
+- **Test Set ROC-AUC:** **0.6042** (Significantly superior to random baseline 0.50).
 - **Classification Report:**
 ```
               precision    recall  f1-score   support
 
-    One-Time       0.98      0.71      0.82     18112
-      Repeat       0.04      0.44      0.08       560
+    One-Time       0.98      0.69      0.81     18112
+      Repeat       0.04      0.47      0.08       560
 
-    accuracy                           0.70     18672
-   macro avg       0.51      0.57      0.45     18672
-weighted avg       0.95      0.70      0.80     18672
+    accuracy                           0.68     18672
+   macro avg       0.51      0.58      0.44     18672
+weighted avg       0.95      0.68      0.78     18672
 
 ```
 
@@ -32,12 +32,12 @@ The empirical Gini importance ranking highlights the primary drivers:
 
 | Rank | Feature | Importance Score | Business Implication |
 | :---: | :--- | :---: | :--- |
-| **1** | `delivery_duration_days` | **0.1769** | Fulfillment speed is the leading predictor of whether a customer returns. |
-| **2** | `items_value` | **0.1708** | Initial basket value indicates customer purchasing power and commitment. |
-| **3** | `freight_value` | **0.1472** | High shipping friction dampens subsequent purchase interest. |
-| **4** | `delivery_delay_days` | **0.1291** | Shipping delays relative to promised SLA trigger churn. |
-| **5** | `review_score` | **0.1288** | Positive survey ratings correlate with repeat brand affinity. |
-| **6** | `max_installments` | **0.0776** | Payment flexibility enables larger commitments. |
+| **1** | `delivery_duration_days` | **0.1800** | Fulfillment speed is the leading predictor of whether a customer returns. |
+| **2** | `items_value` | **0.1726** | Initial basket value indicates customer purchasing power and commitment. |
+| **3** | `freight_value` | **0.1490** | High shipping friction dampens subsequent purchase interest. |
+| **4** | `delivery_delay_days` | **0.1349** | Shipping delays relative to promised SLA trigger churn. |
+| **5** | `review_score` | **0.1164** | Positive survey ratings correlate with repeat brand affinity. |
+| **6** | `max_installments` | **0.0694** | Payment flexibility enables larger commitments. |
 
 ---
 

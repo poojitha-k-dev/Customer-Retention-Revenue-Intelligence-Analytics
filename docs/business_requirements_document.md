@@ -76,3 +76,4 @@ The executive leadership team requires a centralized, automated **Customer Reten
    *Finding:* **R$ 159.83** across 96,478 delivered orders.
 6. **What is the relationship between delivery delays and customer satisfaction?**  
    *Finding:* On-time orders average **4.29★**; delayed orders collapse to **2.57★** (-1.72 stars), and first-order delay reduces subsequent repeat rates by **13.8%**.
+

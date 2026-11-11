@@ -69,3 +69,4 @@ flowchart TD
 - **Idempotent Ingestion:** The database loader checks if `olist_db` exists; table DDL scripts use `DROP TABLE IF EXISTS ... CASCADE` and recreate clean tables without leaving orphaned state.
 - **Fail-Safe Data Marts:** If PostgreSQL is temporarily offline during scheduled reports, the API gracefully serves cached, validated analytical data marts from `data/processed/`.
 - **Integrity Gates:** Automated PyTest test suites halt downstream deployments if primary key uniqueness or foreign key constraints fail.
+
