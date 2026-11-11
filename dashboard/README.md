@@ -283,37 +283,27 @@ CALCULATE(
 
 ---
 
-### Page 4: Customer Experience & Logistics
-*Audience: Supply Chain, Logistics Directors, Customer Support Leads*
+### Page 4: Purchase Behaviour & Product Performance
+*Audience: Commercial Directors, Merchandising, Supply Chain, Logistics Leads*
 
-1. **KPI Scorecard:**
-   - Card 1: `Average Review Score` (4.16 ★)
-   - Card 2: `On-Time Delivery Rate` (91.89%)
-   - Card 3: `Late Delivery Rate` (8.11%)
-   - Card 4: `Avg Delivery Duration` (12.6 Days)
-2. **CSAT Impact of Delivery Delays (Grouped Column Chart):**
-   - X-Axis: Delivery Performance (`On-Time` vs `Delayed`)
-   - Y-Axis: `Average Review Score` (4.29 ★ on-time vs 2.57 ★ delayed)
-3. **Review Rating Breakdown (Bar Chart):**
-   - 1-Star (11.6%), 2-Star (3.3%), 3-Star (8.3%), 4-Star (19.4%), 5-Star (57.4%).
-4. **Logistics Performance by State (Scatter / Bar Chart):**
-   - X-Axis: `customer_state`
-   - Y-Axis: `Average Delivery Days` and `Late Delivery %`.
-5. **Top 10 Product Categories by Delay & Satisfaction (Table with Data Bars).**
-
----
-
-### Page 5: Revenue Intelligence & Product Performance
-*Audience: Commercial Directors, Merchandising, Category Managers*
-
-1. **Top Product Categories by Revenue (Horizontal Bar Chart):**
-   - `Bed Bath Table`, `Health Beauty`, `Computers Accessories`, `Sports Leisure`, `Furniture Decor`.
-2. **Customer Revenue Concentration / Pareto Curve (Line & Clustered Column Chart):**
-   - X-Axis: `Revenue Decile` (Decile 1 to 10)
-   - Columns: `Decile Revenue (BRL)`
-   - Line: `Cumulative Revenue Share %` (Top 20% generate ~54% of revenue).
-3. **Average Order Value by Category vs Freight Proportion (Stacked Column Chart).**
-4. **Top 15 High-Value Customers (Table with Drillthrough to Order History).**
+1. **Product Category Revenue Analysis (Horizontal Bar Chart):**
+   - X-Axis: `Gross Revenue (BRL)`
+   - Y-Axis: `product_category_name_english` (Top 15: Bed Bath Table, Health Beauty, Computers Accessories, Sports Leisure, Furniture Decor).
+   - Tooltips: `Units Sold`, `Avg Item Price`, `Avg Review Score`.
+2. **Monthly Purchase Trends (Line Chart):**
+   - X-Axis: `purchase_year_month` (2016-09 to 2018-08)
+   - Y-Axis: `Total Orders` and `Total Gross Revenue` (Dual Axis).
+3. **Payment Method Distribution (Donut Chart & Installments Bar):**
+   - Donut Chart: Revenue share by payment type (`credit_card` 74.0%, `boleto` 19.3%, `voucher` 3.8%, `debit_card` 1.5%, `unknown` 0.0%).
+   - Bar Chart: Average payment installments by payment method (Credit card average: 3.5 installments).
+4. **Order Basket Value Distribution (Histogram / Bucketed Column Chart):**
+   - Spend tiers: `< R$ 50`, `R$ 50 - 100`, `R$ 100 - 200`, `R$ 200 - 500`, `> R$ 500`.
+5. **Geographic Customer & Revenue Analysis (Filled / Bubble Map & Bar Chart):**
+   - Map: Customer concentration across Brazilian states (`SP`, `RJ`, `MG`, `RS`, `PR`).
+   - Bar Chart: Total revenue and average order value by customer state.
+6. **Logistics & CSAT Sensitivity Panel:**
+   - On-time vs delayed order count and review rating comparison (4.29 ★ on-time vs 2.57 ★ delayed).
+   - Delivery delay distribution and average duration by state.
 
 ---
 
